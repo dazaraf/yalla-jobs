@@ -343,21 +343,20 @@ export async function endorseProfile(
     }
 
     // Create endorsement and update count in a transaction
-    await db.transaction(async (tx) => {
-      await tx.insert(endorsements).values({
-        id: crypto.randomUUID(),
-        endorserWallet: normalizedWallet,
-        profileId: profileId,
-        message: trimmedMessage,
-        relationshipTag: relationshipTag.trim(),
-      })
+// Create endorsement
+await db.insert(endorsements).values({
+  id: crypto.randomUUID(),
+  endorserWallet: endorserWallet.toLowerCase(),
+  profileId,
+  message,
+  relationshipTag,
+})
 
-      await tx
-        .update(profiles)
-        .set({ endorsementCount: sql`${profiles.endorsementCount} + 1` })
-        .where(eq(profiles.id, profileId))
-    })
-
+// Increment count
+await db
+  .update(profiles)
+  .set({ endorsementCount: sql`${profiles.endorsementCount} + 1` })
+  .where(eq(profiles.id, profileId))
     revalidatePath('/seekers')
 
     return { success: true }
