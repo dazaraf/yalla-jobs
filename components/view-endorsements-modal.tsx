@@ -7,7 +7,7 @@ interface Endorsement {
   id: string
   endorserWallet: string
   endorserName?: string
-  endorserTelegram?: string
+  endorserTelegram?: string | null
   message: string
   relationshipTag: string
   createdAt: Date
