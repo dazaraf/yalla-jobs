@@ -1,11 +1,14 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/db'
+import { users, profiles, endorsements, roleEnum } from '@/db/schema'
+import { eq, and, desc, ilike, or, sql, inArray } from 'drizzle-orm'
 import { verifyMessage } from 'viem'
-import { Role } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 
 // Types for actions
+type Role = 'SEEKER' | 'EMPLOYER'
+
 interface AuthResult {
   success: boolean
   user?: {
@@ -41,7 +44,7 @@ export async function authenticateWithWallet(
   walletAddress: string,
   message: string,
   signature: `0x${string}`,
-  role: Role = Role.SEEKER
+  role: Role = 'SEEKER'
 ): Promise<AuthResult> {
   try {
     // Verify the signed message
@@ -58,17 +61,34 @@ export async function authenticateWithWallet(
       }
     }
 
-    // Upsert user into database
-    const user = await prisma.user.upsert({
-      where: { walletAddress: walletAddress.toLowerCase() },
-      update: {
-        updatedAt: new Date(),
-      },
-      create: {
-        walletAddress: walletAddress.toLowerCase(),
-        role,
-      },
+    const normalizedAddress = walletAddress.toLowerCase()
+
+    // Check if user exists
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.walletAddress, normalizedAddress),
     })
+
+    let user
+    if (existingUser) {
+      // Update existing user
+      const [updated] = await db
+        .update(users)
+        .set({ updatedAt: new Date() })
+        .where(eq(users.walletAddress, normalizedAddress))
+        .returning()
+      user = updated
+    } else {
+      // Create new user
+      const [created] = await db
+        .insert(users)
+        .values({
+          id: crypto.randomUUID(),
+          walletAddress: normalizedAddress,
+          role,
+        })
+        .returning()
+      user = created
+    }
 
     return {
       success: true,
@@ -95,63 +115,63 @@ export async function saveProfile(
   profileData: ProfileData
 ): Promise<ProfileResult> {
   try {
+    const normalizedAddress = walletAddress.toLowerCase()
+
     // First, ensure user exists
-    const user = await prisma.user.findUnique({
-      where: { walletAddress: walletAddress.toLowerCase() },
+    let user = await db.query.users.findFirst({
+      where: eq(users.walletAddress, normalizedAddress),
     })
 
     if (!user) {
       // Create user if they don't exist
-      const newUser = await prisma.user.create({
-        data: {
-          walletAddress: walletAddress.toLowerCase(),
-          role: Role.SEEKER,
-        },
-      })
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          id: crypto.randomUUID(),
+          walletAddress: normalizedAddress,
+          role: 'SEEKER',
+        })
+        .returning()
+      user = newUser
+    }
 
-      // Create profile
-      const profile = await prisma.profile.create({
-        data: {
-          userId: newUser.id,
+    // Check if profile exists
+    const existingProfile = await db.query.profiles.findFirst({
+      where: eq(profiles.userId, user.id),
+    })
+
+    let profile
+    if (existingProfile) {
+      // Update existing profile
+      const [updated] = await db
+        .update(profiles)
+        .set({
           name: profileData.name,
           bio: profileData.bio || '',
           telegramHandle: profileData.telegramHandle,
           skillTags: profileData.skillTags,
           projectLinks: profileData.projectLinks || [],
-        },
-      })
-
-      revalidatePath('/seekers')
-      
-      return {
-        success: true,
-        profile: {
-          id: profile.id,
-          name: profile.name,
-        },
-      }
+          updatedAt: new Date(),
+        })
+        .where(eq(profiles.userId, user.id))
+        .returning()
+      profile = updated
+    } else {
+      // Create new profile
+      const [created] = await db
+        .insert(profiles)
+        .values({
+          id: crypto.randomUUID(),
+          userId: user.id,
+          name: profileData.name,
+          bio: profileData.bio || '',
+          telegramHandle: profileData.telegramHandle,
+          skillTags: profileData.skillTags,
+          projectLinks: profileData.projectLinks || [],
+        })
+        .returning()
+      profile = created
     }
-
-    // Upsert profile for existing user
-    const profile = await prisma.profile.upsert({
-      where: { userId: user.id },
-      update: {
-        name: profileData.name,
-        bio: profileData.bio || '',
-        telegramHandle: profileData.telegramHandle,
-        skillTags: profileData.skillTags,
-        projectLinks: profileData.projectLinks || [],
-        updatedAt: new Date(),
-      },
-      create: {
-        userId: user.id,
-        name: profileData.name,
-        bio: profileData.bio || '',
-        telegramHandle: profileData.telegramHandle,
-        skillTags: profileData.skillTags,
-        projectLinks: profileData.projectLinks || [],
-      },
-    })
 
     revalidatePath('/seekers')
 
@@ -176,22 +196,16 @@ export async function saveProfile(
  */
 export async function getSeekers() {
   try {
-    const seekers = await prisma.user.findMany({
-      where: {
-        role: Role.SEEKER,
-        profile: {
-          isNot: null,
-        },
-      },
-      include: {
+    const seekers = await db.query.users.findMany({
+      where: eq(users.role, 'SEEKER'),
+      with: {
         profile: true,
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: desc(users.createdAt),
     })
 
-    return seekers
+    // Filter to only include users with profiles
+    return seekers.filter((seeker) => seeker.profile !== null)
   } catch (error) {
     console.error('Error fetching seekers:', error)
     return []
@@ -208,11 +222,11 @@ export async function revealTelegramHandle(
 ): Promise<{ success: boolean; handle?: string; error?: string }> {
   try {
     // Verify employer is authenticated
-    const employer = await prisma.user.findUnique({
-      where: { walletAddress: employerWalletAddress.toLowerCase() },
+    const employer = await db.query.users.findFirst({
+      where: eq(users.walletAddress, employerWalletAddress.toLowerCase()),
     })
 
-    if (!employer || employer.role !== Role.EMPLOYER) {
+    if (!employer || employer.role !== 'EMPLOYER') {
       return {
         success: false,
         error: 'Only employers can reveal contact information.',
@@ -220,8 +234,8 @@ export async function revealTelegramHandle(
     }
 
     // Get seeker's profile
-    const profile = await prisma.profile.findUnique({
-      where: { userId: seekerUserId },
+    const profile = await db.query.profiles.findFirst({
+      where: eq(profiles.userId, seekerUserId),
     })
 
     if (!profile) {
@@ -250,9 +264,9 @@ export async function revealTelegramHandle(
  */
 export async function getUserProfile(walletAddress: string) {
   try {
-    const user = await prisma.user.findUnique({
-      where: { walletAddress: walletAddress.toLowerCase() },
-      include: {
+    const user = await db.query.users.findFirst({
+      where: eq(users.walletAddress, walletAddress.toLowerCase()),
+      with: {
         profile: true,
       },
     })
@@ -274,30 +288,37 @@ export async function endorseProfile(
   relationshipTag: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    const normalizedWallet = endorserWallet.toLowerCase()
+
     // Check if endorser has a profile
-    const endorserUser = await prisma.user.findUnique({
-      where: { walletAddress: endorserWallet.toLowerCase() },
-      include: { profile: true }
+    const endorserUser = await db.query.users.findFirst({
+      where: eq(users.walletAddress, normalizedWallet),
+      with: { profile: true },
     })
-    
+
     if (!endorserUser?.profile) {
       return { success: false, error: 'You must create a profile before endorsing others.' }
     }
 
-    // Check if message meets minimum length
-    if (!message || message.length < 100) {
+    // Validate and sanitize message
+    if (message == null || typeof message !== 'string') {
+      return { success: false, error: 'Endorsement message is required.' }
+    }
+
+    const trimmedMessage = message.trim()
+    if (trimmedMessage.length < 100) {
       return { success: false, error: 'Endorsement must be at least 100 characters.' }
     }
 
     // Check if relationshipTag is provided
-    if (!relationshipTag) {
+    if (!relationshipTag || typeof relationshipTag !== 'string' || !relationshipTag.trim()) {
       return { success: false, error: 'Please select how you know this person.' }
     }
 
     // Check if profile exists
-    const profile = await prisma.profile.findUnique({
-      where: { id: profileId },
-      include: { user: true }
+    const profile = await db.query.profiles.findFirst({
+      where: eq(profiles.id, profileId),
+      with: { user: true },
     })
 
     if (!profile) {
@@ -305,18 +326,16 @@ export async function endorseProfile(
     }
 
     // Prevent self-endorsement
-    if (profile.user.walletAddress.toLowerCase() === endorserWallet.toLowerCase()) {
+    if (profile.user.walletAddress.toLowerCase() === normalizedWallet) {
       return { success: false, error: 'You cannot endorse yourself.' }
     }
 
     // Check if already endorsed
-    const existingEndorsement = await prisma.endorsement.findUnique({
-      where: {
-        endorserWallet_profileId: {
-          endorserWallet: endorserWallet.toLowerCase(),
-          profileId: profileId,
-        }
-      }
+    const existingEndorsement = await db.query.endorsements.findFirst({
+      where: and(
+        eq(endorsements.endorserWallet, normalizedWallet),
+        eq(endorsements.profileId, profileId)
+      ),
     })
 
     if (existingEndorsement) {
@@ -324,20 +343,20 @@ export async function endorseProfile(
     }
 
     // Create endorsement and update count in a transaction
-    await prisma.$transaction([
-      prisma.endorsement.create({
-        data: {
-          endorserWallet: endorserWallet.toLowerCase(),
-          profileId: profileId,
-          message: message,
-          relationshipTag: relationshipTag,
-        }
-      }),
-      prisma.profile.update({
-        where: { id: profileId },
-        data: { endorsementCount: { increment: 1 } }
+    await db.transaction(async (tx) => {
+      await tx.insert(endorsements).values({
+        id: crypto.randomUUID(),
+        endorserWallet: normalizedWallet,
+        profileId: profileId,
+        message: trimmedMessage,
+        relationshipTag: relationshipTag.trim(),
       })
-    ])
+
+      await tx
+        .update(profiles)
+        .set({ endorsementCount: sql`${profiles.endorsementCount} + 1` })
+        .where(eq(profiles.id, profileId))
+    })
 
     revalidatePath('/seekers')
 
@@ -356,28 +375,27 @@ export async function removeEndorsement(
   profileId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const endorsement = await prisma.endorsement.findUnique({
-      where: {
-        endorserWallet_profileId: {
-          endorserWallet: endorserWallet.toLowerCase(),
-          profileId: profileId,
-        }
-      }
+    const normalizedWallet = endorserWallet.toLowerCase()
+
+    const endorsement = await db.query.endorsements.findFirst({
+      where: and(
+        eq(endorsements.endorserWallet, normalizedWallet),
+        eq(endorsements.profileId, profileId)
+      ),
     })
 
     if (!endorsement) {
       return { success: false, error: 'Endorsement not found.' }
     }
 
-    await prisma.$transaction([
-      prisma.endorsement.delete({
-        where: { id: endorsement.id }
-      }),
-      prisma.profile.update({
-        where: { id: profileId },
-        data: { endorsementCount: { decrement: 1 } }
-      })
-    ])
+    await db.transaction(async (tx) => {
+      await tx.delete(endorsements).where(eq(endorsements.id, endorsement.id))
+
+      await tx
+        .update(profiles)
+        .set({ endorsementCount: sql`${profiles.endorsementCount} - 1` })
+        .where(eq(profiles.id, profileId))
+    })
 
     revalidatePath('/seekers')
 
@@ -396,13 +414,11 @@ export async function hasEndorsed(
   profileId: string
 ): Promise<boolean> {
   try {
-    const endorsement = await prisma.endorsement.findUnique({
-      where: {
-        endorserWallet_profileId: {
-          endorserWallet: endorserWallet.toLowerCase(),
-          profileId: profileId,
-        }
-      }
+    const endorsement = await db.query.endorsements.findFirst({
+      where: and(
+        eq(endorsements.endorserWallet, endorserWallet.toLowerCase()),
+        eq(endorsements.profileId, profileId)
+      ),
     })
     return !!endorsement
   } catch (error) {
@@ -415,19 +431,19 @@ export async function hasEndorsed(
  */
 export async function getProfileEndorsements(profileId: string) {
   try {
-    const endorsements = await prisma.endorsement.findMany({
-      where: { profileId },
-      orderBy: { createdAt: 'desc' },
+    const endorsementList = await db.query.endorsements.findMany({
+      where: eq(endorsements.profileId, profileId),
+      orderBy: desc(endorsements.createdAt),
     })
 
     // Fetch endorser profiles for each endorsement
     const enrichedEndorsements = await Promise.all(
-      endorsements.map(async (endorsement) => {
-        const endorserUser = await prisma.user.findUnique({
-          where: { walletAddress: endorsement.endorserWallet },
-          include: { profile: true }
+      endorsementList.map(async (endorsement) => {
+        const endorserUser = await db.query.users.findFirst({
+          where: eq(users.walletAddress, endorsement.endorserWallet),
+          with: { profile: true },
         })
-        
+
         return {
           ...endorsement,
           endorserName: endorserUser?.profile?.name || 'Anonymous',
@@ -454,50 +470,44 @@ export async function searchSeekers(params: {
   try {
     const { query, skills, sortBy = 'recent' } = params
 
-    let whereClause: any = {
-      role: Role.SEEKER,
-      profile: {
-        isNot: null,
-      },
-    }
-
-    // Build profile filter conditions
-    const profileFilters: any[] = []
-
-    if (query && query.trim()) {
-      const searchTerm = query.trim().toLowerCase()
-      profileFilters.push({
-        OR: [
-          { name: { contains: searchTerm, mode: 'insensitive' } },
-          { bio: { contains: searchTerm, mode: 'insensitive' } },
-        ]
-      })
-    }
-
-    if (skills && skills.length > 0) {
-      profileFilters.push({
-        skillTags: { hasSome: skills }
-      })
-    }
-
-    if (profileFilters.length > 0) {
-      whereClause = {
-        ...whereClause,
-        profile: {
-          AND: profileFilters
-        }
-      }
-    }
-
-    const seekers = await prisma.user.findMany({
-      where: whereClause,
-      include: {
+    // Get all seekers with profiles
+    let seekers = await db.query.users.findMany({
+      where: eq(users.role, 'SEEKER'),
+      with: {
         profile: true,
       },
-      orderBy: sortBy === 'endorsements' 
-        ? { profile: { endorsementCount: 'desc' } }
-        : { createdAt: 'desc' },
+      orderBy: sortBy === 'recent' ? desc(users.createdAt) : undefined,
     })
+
+    // Filter to only include users with profiles
+    seekers = seekers.filter((seeker) => seeker.profile !== null)
+
+    // Apply text search filter
+    if (query && query.trim()) {
+      const searchTerm = query.trim().toLowerCase()
+      seekers = seekers.filter((seeker) => {
+        const name = seeker.profile?.name?.toLowerCase() || ''
+        const bio = seeker.profile?.bio?.toLowerCase() || ''
+        return name.includes(searchTerm) || bio.includes(searchTerm)
+      })
+    }
+
+    // Apply skills filter
+    if (skills && skills.length > 0) {
+      seekers = seekers.filter((seeker) => {
+        const userSkills = seeker.profile?.skillTags || []
+        return skills.some((skill) => userSkills.includes(skill))
+      })
+    }
+
+    // Sort by endorsements if requested
+    if (sortBy === 'endorsements') {
+      seekers.sort((a, b) => {
+        const aCount = a.profile?.endorsementCount || 0
+        const bCount = b.profile?.endorsementCount || 0
+        return bCount - aCount
+      })
+    }
 
     return seekers
   } catch (error) {
