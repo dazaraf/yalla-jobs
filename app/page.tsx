@@ -108,97 +108,97 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Three Blocks Section */}
       <section className="py-16">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-3 gap-6">
-            {/* Feature 1 */}
+            {/* Create a Profile */}
             <div className="p-8 rounded-2xl bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors">
               <div className="w-14 h-14 rounded-xl bg-zinc-800 flex items-center justify-center mb-6">
-                <div className="relative">
-                  <svg className="w-6 h-6 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                  <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-orange-500 flex items-center justify-center">
-                    <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Wallet-Based Identity</h3>
-              <p className="text-zinc-400">
-                Sign up with your wallet. No email required.
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors">
-              <div className="w-14 h-14 rounded-xl bg-zinc-800 flex items-center justify-center mb-6">
-                <div className="relative flex items-center">
-                  <div className="w-8 h-6 rounded bg-zinc-700 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Direct Contact</h3>
-              <p className="text-zinc-400">
-                Connect directly with talent. No recruiters. No middlemen.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors">
-              <div className="w-14 h-14 rounded-xl bg-zinc-800 flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                <svg className="w-7 h-7 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Proof of Work</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Create a Profile</h3>
               <p className="text-zinc-400">
-                See endorsements and on-chain history from other crypto builders.
+                Sign up with your wallet and showcase your skills
+              </p>
+            </div>
+
+            {/* Endorse a Friend */}
+            <div className="p-8 rounded-2xl bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors">
+              <div className="w-14 h-14 rounded-xl bg-zinc-800 flex items-center justify-center mb-6">
+                <svg className="w-7 h-7 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Endorse a Friend</h3>
+              <p className="text-zinc-400">
+                Vouch for people you've worked with
+              </p>
+            </div>
+
+            {/* Browse Candidates */}
+            <div className="p-8 rounded-2xl bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors">
+              <div className="w-14 h-14 rounded-xl bg-zinc-800 flex items-center justify-center mb-6">
+                <svg className="w-7 h-7 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Browse Candidates</h3>
+              <p className="text-zinc-400">
+                Find vetted crypto-native talent
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
+      {/* Sponsor a Party Section */}
       <section className="py-20 border-t border-zinc-800/50">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-semibold text-white text-center mb-16">How It Works</h2>
-          
-          <div className="grid md:grid-cols-3 gap-12 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                1
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Create Your Profile</h3>
-              <p className="text-zinc-400 text-sm">
-                Connect your wallet and fill in your skills, experience, and contact info.
-              </p>
-            </div>
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-semibold text-white text-center mb-6">
+              Hired Someone From Our List? Sponsor A Yalla Bitcoin Party in TLV
+            </h2>
 
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                2
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Get Endorsed</h3>
-              <p className="text-zinc-400 text-sm">
-                Ask colleagues and collaborators to vouch for your work.
-              </p>
-            </div>
+            <p className="text-zinc-400 text-center mb-12 max-w-3xl mx-auto leading-relaxed">
+              Yalla Bitcoin started in TLV as a community of Bitcoiners and crypto enthusiasts finding a safe space in each other to geek out over coins and have a good time. Our community is 600-strong and includes a mix of execs, operators and regular degens. Since 2021, we have hosted 1,000 people across a dozen events. Previous sponsors include Starkware, ZenGo, INX (acquired by Republic) and more.
+            </p>
 
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                3
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="relative aspect-square overflow-hidden rounded-xl group">
+                <Image
+                  src="/party-1.jpg"
+                  alt="Yalla Bitcoin Party"
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Get Hired</h3>
-              <p className="text-zinc-400 text-sm">
-                Companies reach out directly via Telegram. No spam, no games.
-              </p>
+              <div className="relative aspect-square overflow-hidden rounded-xl group">
+                <Image
+                  src="/party-2.jpg"
+                  alt="Yalla Bitcoin Party"
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+              <div className="relative aspect-square overflow-hidden rounded-xl group">
+                <Image
+                  src="/party-3.jpg"
+                  alt="Yalla Bitcoin Party"
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+              <div className="relative aspect-square overflow-hidden rounded-xl group">
+                <Image
+                  src="/party-4.jpg"
+                  alt="Yalla Bitcoin Party"
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
             </div>
           </div>
         </div>
