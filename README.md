@@ -1,6 +1,6 @@
 # BTC Jobs - Bitcoin Community Job Portal
 
-A wallet-based job portal for the Bitcoin community built with Next.js, TypeScript, Tailwind CSS, Prisma, and PostgreSQL.
+A wallet-based job portal for the Bitcoin community built with Next.js, TypeScript, Tailwind CSS, Drizzle ORM, and PostgreSQL.
 
 ## Features
 
@@ -16,7 +16,7 @@ A wallet-based job portal for the Bitcoin community built with Next.js, TypeScri
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **Database**: PostgreSQL
-- **ORM**: Prisma
+- **ORM**: Drizzle ORM
 - **Auth**: Wallet-based (RainbowKit + Wagmi)
 - **UI Components**: shadcn/ui inspired
 
@@ -45,11 +45,11 @@ cp .env.example .env
 
 Edit `.env` with your database URL and WalletConnect project ID.
 
-3. Generate Prisma client and push schema:
+3. Set up your database schema using Drizzle migrations (if needed):
 
 ```bash
-npm run db:generate
-npm run db:push
+# Run migrations with drizzle-kit
+npx drizzle-kit push
 ```
 
 4. Start the development server:
@@ -88,12 +88,12 @@ btc-jobs/
 │       └── textarea.tsx
 ├── actions/
 │   └── auth.ts             # Server actions for auth & profiles
+├── db/
+│   ├── index.ts            # Drizzle database connection
+│   └── schema.ts           # Database schema (Drizzle)
 ├── lib/
-│   ├── prisma.ts           # Prisma client singleton
 │   ├── utils.ts            # Utility functions
 │   └── wagmi.ts            # Wagmi/RainbowKit config
-└── prisma/
-    └── schema.prisma       # Database schema
 ```
 
 ## Database Schema

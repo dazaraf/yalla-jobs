@@ -1,4 +1,5 @@
 import { SeekerOnboardingForm } from '@/components/seeker-onboarding-form'
+import { AccessGate } from '@/components/access-gate'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -8,6 +9,7 @@ export const metadata: Metadata = {
 
 export default function SeekerOnboardingPage() {
   return (
+    <AccessGate>
     <div className="container mx-auto px-4 py-12">
       {/* Header */}
       <div className="text-center mb-12 animate-fade-in">
@@ -55,5 +57,6 @@ export default function SeekerOnboardingPage() {
         </div>
       </div>
     </div>
+    </AccessGate>
   )
 }

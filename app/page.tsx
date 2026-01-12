@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { CreateProfileButton } from '@/components/create-profile-button'
 
 export default function HomePage() {
   return (
@@ -60,11 +61,9 @@ export default function HomePage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/onboarding/seeker">
-                  <button className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-semibold rounded-lg transition-all shadow-lg shadow-orange-500/25">
-                    Create profile
-                  </button>
-                </Link>
+                <CreateProfileButton className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-semibold rounded-lg transition-all shadow-lg shadow-orange-500/25">
+                  Create profile
+                </CreateProfileButton>
                 <Link href="/seekers">
                   <button className="px-8 py-3 text-zinc-300 hover:text-white font-medium transition-colors flex items-center gap-2">
                     I'm hiring talent
@@ -215,11 +214,9 @@ export default function HomePage() {
               Whether you're looking for your next role or your next hire, we've got you covered.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/onboarding/seeker">
-                <button className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-semibold rounded-lg transition-all shadow-lg shadow-orange-500/25">
-                  Create profile
-                </button>
-              </Link>
+              <CreateProfileButton className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white font-semibold rounded-lg transition-all shadow-lg shadow-orange-500/25">
+                Create profile
+              </CreateProfileButton>
               <Link href="/seekers">
                 <button className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold rounded-lg transition-colors border border-zinc-700">
                   Browse talent
