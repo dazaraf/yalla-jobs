@@ -1,6 +1,7 @@
 import { searchSeekers } from '@/actions/auth'
 import { SeekerCard } from '@/components/seeker-card'
 import { SearchFilters } from '@/components/search-filters'
+import { getEthosProfile } from '@/lib/ethos'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
@@ -95,14 +96,25 @@ export default async function SeekersPage({ searchParams }: SeekersPageProps) {
   const sortBy = (searchParams.sort as 'endorsements' | 'recent') || 'recent'
 
   const dbSeekers = await searchSeekers({ query, skills, sortBy })
-  
-  const seekers = dbSeekers.length > 0 
+
+  const baseSeekers = dbSeekers.length > 0
     ? dbSeekers.map(s => ({
         id: s.id,
         walletAddress: s.walletAddress,
         profile: s.profile,
       }))
     : mockSeekers
+
+  const seekers = await Promise.all(
+    baseSeekers.map(async (seeker) => {
+      const ethos = await getEthosProfile(seeker.walletAddress)
+      return {
+        ...seeker,
+        ethosScore: ethos.score,
+        ethosVouchers: ethos.vouchers
+      }
+    })
+  )
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
@@ -134,6 +146,8 @@ export default async function SeekersPage({ searchParams }: SeekersPageProps) {
                 endorsements={seeker.profile?.endorsementCount || 0}
                 walletAddress={seeker.walletAddress}
                 telegramHandle={seeker.profile?.telegramHandle}
+                ethosScore={seeker.ethosScore}
+                ethosVouchers={seeker.ethosVouchers}
               />
             ))}
           </div>

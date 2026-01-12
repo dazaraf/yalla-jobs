@@ -15,6 +15,8 @@ interface SeekerCardProps {
   endorsements: number
   walletAddress: string
   telegramHandle?: string
+  ethosScore?: number | null
+  ethosVouchers?: { address: string; name: string }[]
 }
 
 export function SeekerCard({
@@ -26,6 +28,8 @@ export function SeekerCard({
   endorsements,
   walletAddress,
   telegramHandle,
+  ethosScore,
+  ethosVouchers,
 }: SeekerCardProps) {
   const { address, isConnected } = useAccount()
   const [showContact, setShowContact] = useState(false)
@@ -109,6 +113,22 @@ export function SeekerCard({
             <span className="text-sm font-medium text-orange-400">{endorsementCount}</span>
           </button>
         </div>
+
+        {/* Ethos Score */}
+        {ethosScore && (
+          <div className="mt-2 p-2 rounded-lg bg-zinc-800/50 border border-zinc-700">
+            <div className="flex items-center gap-2">
+              <span>🛡️</span>
+              <span className="text-sm text-zinc-400">Ethos Score:</span>
+              <span className="font-bold text-orange-400">{ethosScore}</span>
+            </div>
+            {ethosVouchers && ethosVouchers.length > 0 && (
+              <p className="text-xs text-zinc-500 mt-1">
+                Vouched by: {ethosVouchers.map(v => v.name).join(', ')}
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Bio */}
         {bio && (
