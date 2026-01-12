@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { EthosBadge } from './ethos-badge'
 
 const navLinks = [
   { href: '/seekers', label: 'Browse Talent' },
@@ -12,6 +14,7 @@ const navLinks = [
 
 export function Navigation() {
   const pathname = usePathname()
+  const [showEthos, setShowEthos] = useState(false)
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-zinc-800/50">
@@ -90,15 +93,26 @@ export function Navigation() {
                     }
 
                     return (
-                      <button
-                        onClick={openAccountModal}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 hover:border-zinc-600 transition-colors"
+                      <div
+                        className="relative"
+                        onMouseEnter={() => setShowEthos(true)}
+                        onMouseLeave={() => setShowEthos(false)}
                       >
-                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-400 to-orange-600" />
-                        <span className="text-sm font-medium text-white">
-                          {account.displayName}
-                        </span>
-                      </button>
+                        <button
+                          onClick={openAccountModal}
+                          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 hover:border-zinc-600 transition-colors"
+                        >
+                          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-400 to-orange-600" />
+                          <span className="text-sm font-medium text-white">
+                            {account.displayName}
+                          </span>
+                        </button>
+                        {showEthos && (
+                          <div className="absolute right-0 top-full mt-2 w-72 z-50">
+                            <EthosBadge />
+                          </div>
+                        )}
+                      </div>
                     )
                   })()}
                 </div>
