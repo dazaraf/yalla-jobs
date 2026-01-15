@@ -9,7 +9,6 @@ import { EthosBadge } from './ethos-badge'
 const navLinks = [
   { href: '/seekers', label: 'Browse Talent' },
   { href: '/#how-it-works', label: 'How It Works' },
-  { href: '/about', label: 'About' },
 ]
 
 export function Navigation() {
@@ -22,9 +21,9 @@ export function Navigation() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 rounded bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center rotate-45 group-hover:rotate-[405deg] transition-transform duration-500">
-            <span className="text-white font-bold -rotate-45 group-hover:rotate-[-405deg] transition-transform duration-500">Y</span>
+            <span className="text-white font-bold -rotate-45 group-hover:rotate-[-405deg] transition-transform duration-500">P</span>
           </div>
-          <span className="font-semibold text-white text-lg">Yalla Jobs</span>
+          <span className="font-semibold text-white text-lg">Paprikos</span>
         </Link>
 
         {/* Navigation Links */}
@@ -76,7 +75,7 @@ export function Navigation() {
                           onClick={openConnectModal}
                           className="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-medium rounded-lg border border-zinc-700 transition-colors"
                         >
-                          I'm hiring talent
+                          Connect Wallet
                         </button>
                       )
                     }

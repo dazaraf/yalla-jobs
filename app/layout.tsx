@@ -4,9 +4,9 @@ import { Navigation } from '@/components/navigation'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Yalla Jobs | Hire Crypto-Native Talent',
+  title: 'Paprikos | Hire Crypto-Native Talent',
   description: 'A curated network of vetted crypto-native talent for serious teams. Connect directly with builders from your local crypto community.',
-  keywords: ['bitcoin', 'jobs', 'crypto', 'web3', 'hiring', 'talent', 'yalla'],
+  keywords: ['bitcoin', 'jobs', 'crypto', 'web3', 'hiring', 'talent', 'paprikos'],
 }
 
 export default function RootLayout({

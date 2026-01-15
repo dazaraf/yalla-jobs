@@ -233,9 +233,9 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded bg-orange-500/20 flex items-center justify-center">
-                <span className="text-orange-400 font-bold">Y</span>
+                <span className="text-orange-400 font-bold">P</span>
               </div>
-              <span className="font-semibold text-white">Yalla Jobs</span>
+              <span className="font-semibold text-white">Paprikos</span>
             </div>
             <p className="text-sm text-zinc-500">
               Built for the crypto community • Powered by Yalla Bitcoin
