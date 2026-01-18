@@ -82,22 +82,22 @@ export function ViewEndorsementsModal({
           ) : (
             <div className="space-y-4">
               {endorsements.map((endorsement) => (
-                <div key={endorsement.id} className="p-4 rounded-xl bg-zinc-800/50 border border-zinc-700 overflow-hidden">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="font-medium text-white text-sm">
+                <div key={endorsement.id} className="p-4 rounded-xl bg-zinc-800/50 border border-zinc-700 overflow-hidden max-w-full">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-white text-sm truncate">
                         {endorsement.endorserName || 'Anonymous'}
                       </p>
                       <p className="text-xs text-zinc-500 font-mono">
                         {endorsement.endorserWallet.slice(0, 6)}...{endorsement.endorserWallet.slice(-4)}
                       </p>
                     </div>
-                    <span className="text-xs text-zinc-500">{formatDate(endorsement.createdAt)}</span>
+                    <span className="text-xs text-zinc-500 flex-shrink-0">{formatDate(endorsement.createdAt)}</span>
                   </div>
                   <span className="inline-block px-2 py-0.5 rounded text-xs bg-orange-500/10 text-orange-400 mb-2">
                     {endorsement.relationshipTag}
                   </span>
-                  <p className="text-sm text-zinc-300 leading-relaxed break-words overflow-hidden">"{endorsement.message}"</p>
+                  <p className="text-sm text-zinc-300 leading-relaxed break-words overflow-hidden whitespace-pre-wrap overflow-wrap-anywhere">"{endorsement.message}"</p>
                 </div>
               ))}
             </div>
